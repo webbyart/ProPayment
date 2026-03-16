@@ -1,0 +1,123 @@
+{
+  "entities": {
+    "User": {
+      "title": "User",
+      "description": "System users with roles",
+      "type": "object",
+      "properties": {
+        "uid": { "type": "string" },
+        "email": { "type": "string" },
+        "role": { "type": "string", "enum": ["admin", "hr"] },
+        "name": { "type": "string" }
+      },
+      "required": ["uid", "email", "role"]
+    },
+    "Employee": {
+      "title": "Employee",
+      "description": "Employee master data",
+      "type": "object",
+      "properties": {
+        "employee_code": { "type": "string" },
+        "name": { "type": "string" },
+        "position": { "type": "string" },
+        "status": { "type": "string", "enum": ["active", "inactive"] },
+        "task_status": { "type": "string", "description": "Current status of employee tasks" }
+      },
+      "required": ["employee_code", "name", "position"]
+    },
+    "Project": {
+      "title": "Project",
+      "description": "Project master data",
+      "type": "object",
+      "properties": {
+        "name": { "type": "string" }
+      },
+      "required": ["name"]
+    },
+    "EmployeeRate": {
+      "title": "Employee Rate",
+      "description": "Wage rates per project for each employee",
+      "type": "object",
+      "properties": {
+        "employee_id": { "type": "string" },
+        "transportation": { "type": "number" },
+        "workshop": { "type": "number" },
+        "onsite": { "type": "number" },
+        "offshore": { "type": "number" }
+      },
+      "required": ["employee_id"]
+    },
+    "Timesheet": {
+      "title": "Timesheet",
+      "description": "Daily work records",
+      "type": "object",
+      "properties": {
+        "date": { "type": "string", "format": "date" },
+        "employee_id": { "type": "string" },
+        "project": { "type": "string" },
+        "time_in": { "type": "string" },
+        "time_out": { "type": "string" },
+        "lunch_deduct": { "type": "number" },
+        "normal_hours": { "type": "number" },
+        "ot15": { "type": "number" },
+        "ot20": { "type": "number" },
+        "ot30": { "type": "number" },
+        "remark": { "type": "string" }
+      },
+      "required": ["date", "employee_id", "project", "time_in", "time_out"]
+    },
+    "OtherIncome": {
+      "title": "Other Income",
+      "description": "Additional earnings like incentives",
+      "type": "object",
+      "properties": {
+        "employee_id": { "type": "string" },
+        "date": { "type": "string", "format": "date" },
+        "confine_space": { "type": "number" },
+        "incentive": { "type": "number" },
+        "perdiem": { "type": "number" }
+      },
+      "required": ["employee_id", "date"]
+    },
+    "ProjectRevenue": {
+      "title": "Project Revenue",
+      "description": "Revenue/Budget for each project",
+      "type": "object",
+      "properties": {
+        "project_name": { "type": "string" },
+        "revenue": { "type": "number" }
+      },
+      "required": ["project_name", "revenue"]
+    }
+  },
+  "firestore": {
+    "/users/{uid}": {
+      "schema": "User",
+      "description": "User profiles and roles"
+    },
+    "/employees/{employeeId}": {
+      "schema": "Employee",
+      "description": "Employee records"
+    },
+    "/projects/{projectId}": {
+      "schema": "Project",
+      "description": "Project types"
+    },
+    "/employee_rates/{employeeId}": {
+      "schema": "EmployeeRate",
+      "description": "Rates for specific employees"
+    },
+    "/timesheets/{timesheetId}": {
+      "schema": "Timesheet",
+      "description": "Daily timesheet entries"
+    },
+    "/other_income/{incomeId}": {
+      "schema": "OtherIncome",
+      "description": "Extra income records"
+    },
+    "/project_revenue/{projectId}": {
+      "schema": "ProjectRevenue",
+      "description": "Revenue data per project"
+    }
+  }
+}

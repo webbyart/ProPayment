@@ -1,0 +1,66 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    
+    // Helper functions
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+    
+    function getUserData() {
+      return get(/databases/$(database)/documents/users/$(request.auth.uid)).data;
+    }
+    
+    function isAdmin() {
+      return isAuthenticated() && (
+        getUserData().role == 'admin' || 
+        request.auth.token.email == 'artkitthana.kh@gmail.com'
+      );
+    }
+    
+    function isHR() {
+      return isAuthenticated() && getUserData().role == 'hr';
+    }
+
+    // Users collection
+    match /users/{uid} {
+      allow read: if isAuthenticated() && (request.auth.uid == uid || isAdmin());
+      allow write: if isAdmin() || (isAuthenticated() && request.auth.uid == uid && !request.resource.data.diff(resource.data).affectedKeys().hasAny(['role']));
+    }
+
+    // Employees collection
+    match /employees/{employeeId} {
+      allow read: if isAuthenticated();
+      allow write: if isAdmin() || isHR();
+    }
+
+    // Projects collection
+    match /projects/{projectId} {
+      allow read: if isAuthenticated();
+      allow write: if isAdmin();
+    }
+
+    // Employee Rates - STRICTLY ADMIN ONLY
+    match /employee_rates/{employeeId} {
+      allow read, write: if isAdmin();
+    }
+
+    // Timesheets
+    match /timesheets/{timesheetId} {
+      allow read: if isAuthenticated();
+      allow write: if isAdmin() || isHR();
+    }
+
+    // Other Income
+    match /other_income/{incomeId} {
+      allow read: if isAuthenticated();
+      allow write: if isAdmin() || isHR();
+    }
+
+    // Project Revenue
+    match /project_revenue/{projectId} {
+      allow read: if isAuthenticated();
+      allow write: if isAdmin();
+    }
+  }
+}
